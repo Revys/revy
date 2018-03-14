@@ -1,0 +1,32 @@
+{
+  "name": "revys/revy",
+  "version": "0.0.1",
+  "authors": [
+    {
+      "name": "Alexander Topalo",
+      "email": "saneock19@gmail.com"
+    }
+  ],
+  "minimum-stability": "dev",
+  "require": {
+    "intervention/image": "^2.3"
+  },
+  "autoload": {
+    "psr-4": {
+      "Revys\\Revy\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Revys\\Revy\\Tests\\": "tests/",
+      "Revys\\Revy\\Database\\Seeds\\": "database/seeds/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Revys\\Revy\\App\\Providers\\RevyServiceProvider"
+      ]
+    }
+  }
+}

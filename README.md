@@ -33,14 +33,14 @@ You are ready to go!
 ## Basic usage
 
 ### Routes 
-You can easily specify multilang routes.
-```
+You can easily specify multilang routes:
+```php
 use Revys\Revy\App\Routes;
 
 // Set up the default route
 Route::get('/', 'PageController@page');
 
-// Specifies *lang* middleware and */{locale}* prefix 
+// Specifies 'lang' middleware and '/{locale}' prefix 
 Routes::withLanguage(function () {
     // Next line will set up routes like /{locale}/{page} to PageController@page
     Routes::definePageRoutes();

@@ -10,7 +10,7 @@ $factory->define(Page::class, function (Faker $faker) {
         Entity::getStringIdField() => $faker->word,
         'title'                    => $faker->word,
         'meta_title'               => $faker->word,
-        'meta_description'         => $faker->paragraph,
+        'meta_description'         => $faker->sentence,
         'meta_keywords'            => $faker->words(5, true)
     ];
 });

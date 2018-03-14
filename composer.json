@@ -20,7 +20,10 @@
     "psr-4": {
       "Revys\\Revy\\Tests\\": "tests/",
       "Revys\\Revy\\Database\\Seeds\\": "database/seeds/"
-    }
+    },
+    "files": [
+      "src/tests/utilities/functions.php"
+    ]
   },
   "extra": {
     "laravel": {

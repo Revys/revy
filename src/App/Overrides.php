@@ -83,8 +83,8 @@ class Overrides
 		$map = array();
 
 		$directories = array(
-			base_path('vendor/revys/revy/App'),
-			base_path('vendor/revys/revy-admin/App')
+			base_path('vendor/revys/revy/src/App'),
+//			base_path('vendor/revys/revy-admin/App')
 		);
 
 		\File::cleanDirectory($this->cache_classes);
@@ -192,7 +192,7 @@ class Overrides
 
 				if (! \File::exists($dir))
 					\File::makeDirectory($dir, 0777, true);
-
+                echo $file;
 				if (file_put_contents($file, $content))
 					return str_replace(base_path(), '', $file);
 			}

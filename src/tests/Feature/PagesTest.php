@@ -4,6 +4,7 @@ namespace Revys\Revy\Tests\Feature;
 
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Revys\Revy\App\Entity;
+use Revys\Revy\App\Language;
 use Revys\Revy\App\Page;
 use Revys\Revy\Tests\Languages;
 use Revys\Revy\Tests\TestCase;

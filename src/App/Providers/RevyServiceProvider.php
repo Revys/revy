@@ -67,6 +67,7 @@ class RevyServiceProvider extends ServiceProvider
 
         $loader = AliasLoader::getInstance();
         $loader->alias('Image', Image::class);
+        $loader->alias('Revy', Revy::class);
     }
 
     public function load()

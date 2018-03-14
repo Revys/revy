@@ -33,7 +33,7 @@ You are ready to go!
 ## Basic usage
 
 ### Routes 
-You can easily specify multilang routes:
+You can easily set multilang routes:
 ```php
 use Revys\Revy\App\Routes;
 

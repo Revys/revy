@@ -17,13 +17,18 @@ Wrapper for Laravel Framework.
          }
     ]
     ```
-3. Run 
+3. Install package via *composer require*
     ```
     composer require revys/revy
     ```
     or add to your composer.json to **autoload** section and update your dependencies
     ```
     "revys/revy": "^0.0.1"
+    ```
+
+4. Run migrations
+    ```
+    php artisan migrate --seeder="Revys\Revy\Database\Seeds\DatabaseSeeder"
     ```
     
 You are ready to go!

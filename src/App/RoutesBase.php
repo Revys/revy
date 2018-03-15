@@ -48,8 +48,3 @@ class RoutesBase
         }
     }
 }
-
-class Request2 extends Request
-{
-
-}

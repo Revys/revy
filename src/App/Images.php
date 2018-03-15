@@ -34,6 +34,7 @@ class Images extends Collection
     /**
      * @param UploadedFile $image
      * @return Image
+     * @todo Add ImageAddEvent
      */
     public function add($image)
     {

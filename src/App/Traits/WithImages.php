@@ -36,14 +36,11 @@ trait WithImages
     /**
      * @return array
      */
-    public function getImageTypes()
+    public function getImageThumbnails()
     {
         return [
             'original' => function (Image $image, Entity $object) {
                 return $image;
-            },
-            'slider'   => function (Image $image, Entity $object) {
-                return $image->getInstance()->resize(100, 100);
             }
         ];
     }
@@ -52,9 +49,9 @@ trait WithImages
      * @param string $type
      * @return \Closure|bool
      */
-    public function getImageType($type)
+    public function getImageThumbnail($type)
     {
-        return $this->getImageTypes()[$type] ?? false;
+        return $this->getImageThumbnails()[$type] ?? false;
     }
 
     public function getImagesDir()

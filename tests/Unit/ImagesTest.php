@@ -12,6 +12,13 @@ class ImagesTest extends TestCase
 {
     use DatabaseMigrations;
 
+    public function setUp()
+    {
+        parent::setUp();
+
+        Storage::fake('public');
+    }
+
     /**
      * @param Image $image
      */
@@ -24,6 +31,20 @@ class ImagesTest extends TestCase
             'model'     => $image->getObject()->getModelName(),
             'filename'  => $image->filename
         ]);
+    }
+
+    /**
+     * @return array
+     */
+    public function createAttachedImage()
+    {
+        $object = WithImagesTraitTest::getObject();
+
+        $image = self::createImage();
+
+        $image = $object->images()->add($image);
+
+        return [$object, $image];
     }
 
     /**
@@ -51,20 +72,9 @@ class ImagesTest extends TestCase
         return UploadedFile::fake()->image($name);
     }
 
-    public function setUp()
-    {
-        parent::setUp();
-
-        Storage::fake('public');
-    }
-
     public function test_image_can_be_added()
     {
-        $object = WithImagesTraitTest::getObject();
-
-        $image = self::createImage();
-
-        $image = $object->images()->add($image);
+        [$object, $image] = $this->createAttachedImage();
 
         $this->assertImageExists($image);
     }
@@ -76,7 +86,7 @@ class ImagesTest extends TestCase
         $image = self::createImage();
         $image2 = self::createImage();
 
-        list($image, $image2) = $object->images()->addMany([
+        [$image, $image2] = $object->images()->addMany([
             $image,
             $image2
         ]);
@@ -87,11 +97,7 @@ class ImagesTest extends TestCase
 
     public function test_image_can_be_set()
     {
-        $object = WithImagesTraitTest::getObject();
-
-        $image = self::createImage();
-
-        $image = $object->images()->add($image);
+        [$object, $image] = $this->createAttachedImage();
 
         $this->assertImageExists($image);
 
@@ -133,11 +139,7 @@ class ImagesTest extends TestCase
 
     public function test_image_can_be_removed_by_Image_object()
     {
-        $object = WithImagesTraitTest::getObject();
-
-        $image = self::createImage();
-
-        $image = $object->images()->add($image);
+        [$object, $image] = $this->createAttachedImage();
 
         $this->assertImageExists($image);
 
@@ -148,16 +150,22 @@ class ImagesTest extends TestCase
 
     public function test_image_can_be_removed_by_image_filename()
     {
-        $object = WithImagesTraitTest::getObject();
-
-        $image = self::createImage();
-
-        $image = $object->images()->add($image);
+        [$object, $image] = $this->createAttachedImage();
 
         $this->assertImageExists($image);
 
         $object->images()->remove($image->filename);
 
         $this->assertImageMissing($image);
+    }
+
+    /** @test */
+    public function create_thumbnail()
+    {
+        [$object, $image] = $this->createAttachedImage();
+
+        $image->createThumbnail('test');
+
+        Storage::disk('public')->assertExists($image->getPath('test'));
     }
 }

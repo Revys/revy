@@ -4,6 +4,7 @@ namespace Revys\Revy\App;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Revys\Revy\App\Traits\WithImages;
 
 /**
@@ -22,7 +23,6 @@ class Image extends Entity
      * @var UploadedFile|null
      */
     protected $instance;
-
     protected $appends = ['path'];
 
     public function getPathAttribute()
@@ -107,21 +107,6 @@ class Image extends Entity
         return $image;
     }
 
-    /**
-     * @param mixed|UploadedFile $file
-     * @param null|string $filename
-     * @return Image
-     */
-    public static function createFrom($file, $filename = null)
-    {
-        if (! $filename and $file instanceof UploadedFile)
-            $filename = $file->getClientOriginalName();
-
-        return Image::new(function () use ($file) {
-            return \Image::make($file);
-        }, $filename);
-    }
-
     public function getDir($type = 'original')
     {
         return $this->getObject()->getImageDir($type);
@@ -130,5 +115,32 @@ class Image extends Entity
     public function getPath($type = 'original')
     {
         return $this->getDir($type) . '/' . $this->filename;
+    }
+
+    /**
+     * @param $name
+     * @return \Intervention\Image\Image
+     * @throws \Exception
+     * @todo Create thumbnails on ImageAddEvent
+     */
+    public function createThumbnail($name)
+    {
+        $modifier = $this->object->getImageThumbnails()[$name] ?: '';
+
+        if ($modifier === '') {
+            throw new \Exception(
+                'Thumbnail with name "' . $name . '" does not exists at model ' . $this->object->getMorphClass()
+            );
+        }
+
+        Storage::disk('public')->makeDirectory($this->getDir($name));
+
+        $thumb = $modifier($this, $this->getObject());
+
+        $thumb->save(
+            Storage::disk('public')->path($this->getPath($name))
+        );
+
+        return $thumb;
     }
 }

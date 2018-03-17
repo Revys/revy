@@ -6,6 +6,7 @@ use File;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
+use Revys\Revy\App\Events\ImageAdded;
 use Revys\Revy\App\Traits\WithImages;
 
 class Images extends Collection
@@ -35,7 +36,6 @@ class Images extends Collection
      * @param UploadedFile $image
      * @param bool $createThumbnails
      * @return Image
-     * @todo Add ImageAddEvent
      */
     public function add($image, $createThumbnails = true)
     {
@@ -59,6 +59,8 @@ class Images extends Collection
         if ($createThumbnails) {
              $image->createThumbnails();
         }
+
+        event(new ImageAdded($image));
 
         return $image;
     }

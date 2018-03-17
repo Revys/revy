@@ -192,7 +192,7 @@ class Overrides
 
 				if (! \File::exists($dir))
 					\File::makeDirectory($dir, 0777, true);
-                echo $file;
+
 				if (file_put_contents($file, $content))
 					return str_replace(base_path(), '', $file);
 			}

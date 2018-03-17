@@ -3,7 +3,7 @@
 namespace Revys\Revy\App;
 
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Revys\Revy\App\Traits\WithImages;
 
 /**
@@ -22,7 +22,6 @@ class Image extends Entity
      * @var UploadedFile|null
      */
     protected $instance;
-
     protected $appends = ['path'];
 
     public function getPathAttribute()
@@ -107,21 +106,6 @@ class Image extends Entity
         return $image;
     }
 
-    /**
-     * @param mixed|UploadedFile $file
-     * @param null|string $filename
-     * @return Image
-     */
-    public static function createFrom($file, $filename = null)
-    {
-        if (! $filename and $file instanceof UploadedFile)
-            $filename = $file->getClientOriginalName();
-
-        return Image::new(function () use ($file) {
-            return \Image::make($file);
-        }, $filename);
-    }
-
     public function getDir($type = 'original')
     {
         return $this->getObject()->getImageDir($type);
@@ -130,5 +114,90 @@ class Image extends Entity
     public function getPath($type = 'original')
     {
         return $this->getDir($type) . '/' . $this->filename;
+    }
+
+    public function remove()
+    {
+        return $this->getObject()->images()->remove($this);
+    }
+
+    /**
+     * @param $name
+     * @param null|\Closure $modifier
+     * @return bool|\Intervention\Image\Image
+     * @todo Create thumbnails on ImageAddEvent
+     * @throws \Exception
+     */
+    public function createThumbnail($name, $modifier = null)
+    {
+        $this->assertThumbnailExists($name);
+
+        $function = $this->object->getImageThumbnail($name);
+
+        $function = $modifier ?? $function;
+
+        $disk = Storage::disk('public');
+
+        $disk->makeDirectory($this->getDir($name));
+
+        $storePath = ($name == 'original') ? $this->getInstance()->getPathname() : $disk->path($this->getPath());
+
+        $image = \Image::make($storePath);
+
+        $thumb = $function($image, $this->getObject());
+
+        $thumb->save(
+            $disk->path($this->getPath($name))
+        );
+
+        return $thumb;
+    }
+
+    public function createThumbnails()
+    {
+        foreach ($this->object->getImageThumbnails() as $name => $modifier) {
+            $this->createThumbnail($name);
+        }
+    }
+
+    public function removeThumbnail($name)
+    {
+        $this->assertThumbnailExists($name);
+
+        Storage::disk('public')->delete($this->getPath($name));
+
+        return true;
+    }
+
+    public function removeThumbnails()
+    {
+        foreach ($this->object->getImageThumbnails() as $name => $modifier) {
+            $this->removeThumbnail($name);
+        }
+    }
+
+    /**
+     * @param $name
+     * @return bool|\Intervention\Image\Image
+     * @throws \Exception
+     */
+    public function recreateThumbnail($name)
+    {
+        $this->assertThumbnailExists($name);
+
+        return $this->createThumbnail($name);
+    }
+
+    /**
+     * @param $name
+     * @throws \Exception
+     */
+    public function assertThumbnailExists($name) : void
+    {
+        if (! $this->getObject()->imageThumbnailExists($name)) {
+            throw new \Exception(
+                'Thumbnail with name "' . $name . '" does not exists at model ' . $this->object->getMorphClass()
+            );
+        }
     }
 }

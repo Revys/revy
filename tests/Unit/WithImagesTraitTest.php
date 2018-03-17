@@ -20,7 +20,7 @@ class WithImagesTraitTest extends TestCase
     {
         $object = new TestEntity();
 
-        $object->id = 1;
+        $object->id = rand(1, 10000);
 
         return $object;
     }
@@ -50,19 +50,29 @@ class WithImagesTraitTest extends TestCase
     }
 
     /** @test */
-    public function image_types_can_be_obtained()
+    public function image_thumbnails_can_be_obtained()
     {
         $object = self::getObject();
 
-        $this->assertTrue(is_array($object->getImageTypes()));
+        $this->assertTrue(is_array($object->getImageThumbnails()));
     }
 
     /** @test */
-    public function image_type_can_be_obtained()
+    public function image_thumbnail_can_be_obtained()
     {
         $object = self::getObject();
 
-        $this->assertInstanceOf(\Closure::class, $object->getImageType('original'));
-        $this->assertFalse($object->getImageType('not_exist'));
+        $this->assertInstanceOf(\Closure::class, $object->getImageThumbnail('original'));
+        $this->assertFalse($object->getImageThumbnail('not_exist'));
+    }
+
+    /** @test */
+    public function imageThumbnailExists_works_correctly()
+    {
+        $object = self::getObject();
+
+        $this->assertTrue($object->imageThumbnailExists('test'));
+
+        $this->assertFalse($object->imageThumbnailExists('not-exists'));
     }
 }

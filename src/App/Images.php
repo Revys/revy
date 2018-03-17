@@ -6,6 +6,8 @@ use File;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
+use Revys\Revy\App\Events\ImageAdded;
+use Revys\Revy\App\Events\ImageRemoved;
 use Revys\Revy\App\Traits\WithImages;
 
 class Images extends Collection
@@ -33,9 +35,10 @@ class Images extends Collection
 
     /**
      * @param UploadedFile $image
+     * @param bool $createThumbnails
      * @return Image
      */
-    public function add($image)
+    public function add($image, $createThumbnails = true)
     {
         $object = $this->getObject();
 
@@ -45,11 +48,20 @@ class Images extends Collection
 
         $image->setUniqueName();
 
-        $image->getInstance()->storeAs($image->getDir(), $image->filename, 'public');
+        if ($object->getImageThumbnail('original'))
+            $image->createThumbnail('original');
+        else
+            $image->getInstance()->storeAs($image->getDir(), $image->filename, 'public');
 
         $image->save();
 
         $this->push($image);
+
+        if ($createThumbnails) {
+             $image->createThumbnails();
+        }
+
+        event(new ImageAdded($image));
 
         return $image;
     }
@@ -120,8 +132,66 @@ class Images extends Collection
             return;
         }
 
+        // Remove thumbnails
+        $image->removeThumbnails();
+
+        event(new ImageRemoved($image));
+
         $this->reject(function ($item) use ($image) {
             return $item->filename == $image->filename;
         });
+    }
+
+    /**
+     * @param string $name
+     */
+    public function removeThumbnail($name)
+    {
+        $this->assertThumbnailExists($name);
+
+        Storage::disk('public')->deleteDirectory($this->getObject()->getImageDir($name));
+    }
+
+    public function removeThumbnails()
+    {
+        $object = $this->getObject();
+
+        foreach ($object->getImageThumbnails() as $name => $modifier) {
+            Storage::disk('public')->deleteDirectory($object->getImageDir($name));
+        }
+    }
+
+    /**
+     * @param string $name
+     */
+    public function recreateThumbnail($name)
+    {
+        $this->assertThumbnailExists($name);
+
+        $this->each(function($image) use ($name) {
+            $image->recreateThumbnail($name);
+        });
+    }
+
+    public function recreateThumbnails()
+    {
+        foreach ($this->getObject()->getImageThumbnails() as $name => $modifier) {
+            $this->each(function ($image) use ($name) {
+                $image->recreateThumbnail($name);
+            });
+        }
+    }
+
+    /**
+     * @param $name
+     * @throws \Exception
+     */
+    public function assertThumbnailExists($name) : void
+    {
+        if (! $this->getObject()->imageThumbnailExists($name)) {
+            throw new \Exception(
+                'Thumbnail with name "' . $name . '" does not exists at model ' . $this->object->getMorphClass()
+            );
+        }
     }
 }

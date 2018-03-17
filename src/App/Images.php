@@ -7,6 +7,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Revys\Revy\App\Events\ImageAdded;
+use Revys\Revy\App\Events\ImageRemoved;
 use Revys\Revy\App\Traits\WithImages;
 
 class Images extends Collection
@@ -133,6 +134,8 @@ class Images extends Collection
 
         // Remove thumbnails
         $image->removeThumbnails();
+
+        event(new ImageRemoved($image));
 
         $this->reject(function ($item) use ($image) {
             return $item->filename == $image->filename;

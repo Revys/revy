@@ -7,6 +7,7 @@ use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Revys\Revy\App\Events\ImageAdded;
+use Revys\Revy\App\Events\ImageRemoved;
 use Revys\Revy\App\Image;
 use Revys\Revy\App\Images;
 use Revys\Revy\Tests\TestCase;
@@ -404,15 +405,29 @@ class ImagesTest extends TestCase
         $this->assertEquals(15, $width);
         $this->assertEquals(15, $height);
     }
-    
+
     /** @test */
-    public function event_is_dispated_after_adding_an_image()
+    public function event_is_dispatched_after_adding_an_image()
     {
         \Event::fake();
 
         [$object, $image] = self::createAttachedImage();
 
         \Event::assertDispatched(ImageAdded::class, function ($e) use ($image) {
+            return $e->image->id === $image->id;
+        });
+    }
+
+    /** @test */
+    public function event_is_dispatched_after_removing_an_image()
+    {
+        \Event::fake();
+
+        [$object, $image] = self::createAttachedImage();
+
+        $image->remove();
+
+        \Event::assertDispatched(ImageRemoved::class, function ($e) use ($image) {
             return $e->image->id === $image->id;
         });
     }

@@ -116,6 +116,11 @@ class Image extends Entity
         return $this->getDir($type) . '/' . $this->filename;
     }
 
+    public function remove()
+    {
+        return $this->getObject()->images()->remove($this);
+    }
+
     /**
      * @param $name
      * @param null|\Closure $modifier

@@ -3,8 +3,8 @@
 namespace Revys\Revy\Tests;
 
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Image;
 use Revys\Revy\App\Entity;
-use Revys\Revy\App\Image;
 use Revys\Revy\App\Traits\WithImages;
 
 class TestEntity extends Entity
@@ -18,10 +18,10 @@ class TestEntity extends Entity
     {
         return [
             'original' => function (Image $image, Entity $object) {
-                return $image;
+                return $image->resize(20, 20);
             },
             'test'     => function (Image $image, Entity $object) {
-                return \Image::make(Storage::disk('public')->get($image->getPath()))->resize(100, 100);
+                return $image->resize(100, 100);
             }
         ];
     }

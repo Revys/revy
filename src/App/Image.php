@@ -3,7 +3,6 @@
 namespace Revys\Revy\App;
 
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Revys\Revy\App\Traits\WithImages;
 
@@ -119,28 +118,63 @@ class Image extends Entity
 
     /**
      * @param $name
-     * @return \Intervention\Image\Image
-     * @throws \Exception
+     * @return bool|\Intervention\Image\Image
      * @todo Create thumbnails on ImageAddEvent
      */
     public function createThumbnail($name)
     {
-        $modifier = $this->object->getImageThumbnails()[$name] ?: '';
+        $modifier = $this->object->getImageThumbnail($name) ?: '';
 
         if ($modifier === '') {
-            throw new \Exception(
+            \Log::error(
                 'Thumbnail with name "' . $name . '" does not exists at model ' . $this->object->getMorphClass()
             );
+            return false;
         }
 
-        Storage::disk('public')->makeDirectory($this->getDir($name));
+        $disk = Storage::disk('public');
 
-        $thumb = $modifier($this, $this->getObject());
+        $disk->makeDirectory($this->getDir($name));
+
+        $storePath = ($name == 'original') ? $this->getInstance()->getPathname() : $disk->path($this->getPath());
+
+        $image = \Image::make($storePath);
+
+        $thumb = $modifier($image, $this->getObject());
 
         $thumb->save(
-            Storage::disk('public')->path($this->getPath($name))
+            $disk->path($this->getPath($name))
         );
 
         return $thumb;
     }
+
+    public function createThumbnails()
+    {
+        foreach ($this->object->getImageThumbnails() as $name => $modifier) {
+            $this->createThumbnail($name);
+        }
+    }
+
+    public function removeThumbnail($name)
+    {
+        if ($this->object->getImageThumbnail($name) == false) {
+            \Log::warning(
+                'Thumbnail with name "' . $name . '" does not exists at model ' . $this->object->getMorphClass()
+            );
+            return true;
+        }
+
+        Storage::disk('public')->delete($this->getPath($name));
+
+        return true;
+    }
+
+    public function removeThumbnails()
+    {
+        foreach ($this->object->getImageThumbnails() as $name => $modifier) {
+            $this->removeThumbnail($name);
+        }
+    }
+
 }

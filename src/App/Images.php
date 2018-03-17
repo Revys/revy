@@ -33,10 +33,11 @@ class Images extends Collection
 
     /**
      * @param UploadedFile $image
+     * @param bool $createThumbnails
      * @return Image
      * @todo Add ImageAddEvent
      */
-    public function add($image)
+    public function add($image, $createThumbnails = true)
     {
         $object = $this->getObject();
 
@@ -46,11 +47,18 @@ class Images extends Collection
 
         $image->setUniqueName();
 
-        $image->getInstance()->storeAs($image->getDir(), $image->filename, 'public');
+        if ($object->getImageThumbnail('original'))
+            $image->createThumbnail('original');
+        else
+            $image->getInstance()->storeAs($image->getDir(), $image->filename, 'public');
 
         $image->save();
 
         $this->push($image);
+
+        if ($createThumbnails) {
+             $image->createThumbnails();
+        }
 
         return $image;
     }
@@ -120,6 +128,9 @@ class Images extends Collection
         } catch (\Exception $e) {
             return;
         }
+
+        // Remove thumbnails
+        $image->removeThumbnails();
 
         $this->reject(function ($item) use ($image) {
             return $item->filename == $image->filename;

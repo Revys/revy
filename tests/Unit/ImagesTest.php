@@ -34,15 +34,16 @@ class ImagesTest extends TestCase
     }
 
     /**
+     * @param bool $createThumbnails
      * @return array
      */
-    public function createAttachedImage()
+    public function createAttachedImage($createThumbnails = false)
     {
         $object = WithImagesTraitTest::getObject();
 
         $image = self::createImage();
 
-        $image = $object->images()->add($image);
+        $image = $object->images()->add($image, $createThumbnails);
 
         return [$object, $image];
     }
@@ -167,5 +168,86 @@ class ImagesTest extends TestCase
         $image->createThumbnail('test');
 
         Storage::disk('public')->assertExists($image->getPath('test'));
+    }
+
+    /** @test */
+    public function adding_an_image_goes_through_original_thumbnail()
+    {
+        // Width and height of that image is 10px
+        // TestEntity has image type "original", that resize image to 20x20px
+        [$object, $image] = $this->createAttachedImage(true);
+
+        [$width, $height] = getimagesize(Storage::disk('public')->path($image->getPath()));
+
+        $this->assertEquals(20, $width);
+        $this->assertEquals(20, $height);
+    }
+
+    /** @test */
+    public function createThumbnails_can_create_all_thumbnails()
+    {
+        [$object, $image] = $this->createAttachedImage();
+
+        $image->createThumbnails();
+
+        // Original thumbnail
+        [$width, $height] = getimagesize(Storage::disk('public')->path($image->getPath()));
+        $this->assertEquals(20, $width);
+        $this->assertEquals(20, $height);
+
+        // Test thumbnail
+        Storage::disk('public')->assertExists($image->getPath('test'));
+    }
+
+    /** @test */
+    public function when_adding_image_also_creates_thumbnails()
+    {
+        [$object, $image] = $this->createAttachedImage(true);
+
+        Storage::disk('public')->assertExists($image->getPath('test'));
+    }
+
+    /** @test */
+    public function when_removing_all_entity_images_also_removes_thumbnails()
+    {
+        [$object, $image] = $this->createAttachedImage(true);
+
+        $object->images()->removeAll($image);
+
+        Storage::disk('public')->assertMissing($image->getPath('test'));
+    }
+
+    /** @test */
+    public function when_removing_image_also_removes_thumbnails()
+    {
+        [$object, $image] = $this->createAttachedImage(true);
+
+        $object->images()->remove($image);
+
+        Storage::disk('public')->assertMissing($image->getPath('test'));
+    }
+
+    /** @test */
+    public function recreate_thumbnail_of_image()
+    {
+
+    }
+
+    /** @test */
+    public function recreate_thumbnail_of_entity()
+    {
+
+    }
+
+    /** @test */
+    public function recreate_all_thumbnails_of_entity()
+    {
+        
+    }
+
+    /** @test */
+    public function recreate_thumbnails_of_all_entities()
+    {
+
     }
 }

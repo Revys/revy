@@ -38,11 +38,7 @@ trait WithImages
      */
     public function getImageThumbnails()
     {
-        return [
-            'original' => function (Image $image, Entity $object) {
-                return $image;
-            }
-        ];
+        return [];
     }
 
     /**

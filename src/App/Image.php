@@ -118,19 +118,22 @@ class Image extends Entity
 
     /**
      * @param $name
+     * @param null|\Closure $modifier
      * @return bool|\Intervention\Image\Image
      * @todo Create thumbnails on ImageAddEvent
      */
-    public function createThumbnail($name)
+    public function createThumbnail($name, $modifier = null)
     {
-        $modifier = $this->object->getImageThumbnail($name) ?: '';
+        $function = $this->object->getImageThumbnail($name);
 
-        if ($modifier === '') {
+        if (! $function) {
             \Log::error(
                 'Thumbnail with name "' . $name . '" does not exists at model ' . $this->object->getMorphClass()
             );
             return false;
         }
+
+        $function = $modifier ?: $function;
 
         $disk = Storage::disk('public');
 
@@ -140,7 +143,7 @@ class Image extends Entity
 
         $image = \Image::make($storePath);
 
-        $thumb = $modifier($image, $this->getObject());
+        $thumb = $function($image, $this->getObject());
 
         $thumb->save(
             $disk->path($this->getPath($name))

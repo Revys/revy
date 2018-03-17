@@ -10,6 +10,7 @@ use Revys\Revy\Tests\TestCase;
 
 class ImagesTest extends TestCase
 {
+    public $disk;
     use DatabaseMigrations;
 
     public function setUp()
@@ -17,6 +18,8 @@ class ImagesTest extends TestCase
         parent::setUp();
 
         Storage::fake('public');
+
+        $this->disk = Storage::disk('public');
     }
 
     /**
@@ -24,7 +27,7 @@ class ImagesTest extends TestCase
      */
     public function assertImageExists(Image $image)
     {
-        Storage::disk('public')->assertExists($image->getPath());
+        $this->disk->assertExists($image->getPath());
 
         $this->assertDatabaseHas('images', [
             'object_id' => $image->getObject()->id,
@@ -53,7 +56,7 @@ class ImagesTest extends TestCase
      */
     private function assertImageMissing($image)
     {
-        Storage::disk('public')->assertMissing($image->getPath());
+        $this->disk->assertMissing($image->getPath());
 
         $this->assertDatabaseMissing('images', [
             'object_id' => $image->getObject()->id,
@@ -167,7 +170,24 @@ class ImagesTest extends TestCase
 
         $image->createThumbnail('test');
 
-        Storage::disk('public')->assertExists($image->getPath('test'));
+        $this->disk->assertExists($image->getPath('test'));
+    }
+
+    /** @test */
+    public function create_thumbnail_from_closure()
+    {
+        [$object, $image] = $this->createAttachedImage();
+
+        $image->createThumbnail('test', function ($image, $object) {
+            return $image->resize(30, 30);
+        });
+
+        $this->disk->assertExists($image->getPath('test'));
+
+        [$width, $height] = getimagesize($this->disk->path($image->getPath('test')));
+
+        $this->assertEquals(30, $width);
+        $this->assertEquals(30, $height);
     }
 
     /** @test */
@@ -177,7 +197,7 @@ class ImagesTest extends TestCase
         // TestEntity has image type "original", that resize image to 20x20px
         [$object, $image] = $this->createAttachedImage(true);
 
-        [$width, $height] = getimagesize(Storage::disk('public')->path($image->getPath()));
+        [$width, $height] = getimagesize($this->disk->path($image->getPath()));
 
         $this->assertEquals(20, $width);
         $this->assertEquals(20, $height);
@@ -191,12 +211,12 @@ class ImagesTest extends TestCase
         $image->createThumbnails();
 
         // Original thumbnail
-        [$width, $height] = getimagesize(Storage::disk('public')->path($image->getPath()));
+        [$width, $height] = getimagesize($this->disk->path($image->getPath()));
         $this->assertEquals(20, $width);
         $this->assertEquals(20, $height);
 
         // Test thumbnail
-        Storage::disk('public')->assertExists($image->getPath('test'));
+        $this->disk->assertExists($image->getPath('test'));
     }
 
     /** @test */
@@ -204,7 +224,7 @@ class ImagesTest extends TestCase
     {
         [$object, $image] = $this->createAttachedImage(true);
 
-        Storage::disk('public')->assertExists($image->getPath('test'));
+        $this->disk->assertExists($image->getPath('test'));
     }
 
     /** @test */
@@ -214,7 +234,7 @@ class ImagesTest extends TestCase
 
         $object->images()->removeAll($image);
 
-        Storage::disk('public')->assertMissing($image->getPath('test'));
+        $this->disk->assertMissing($image->getPath('test'));
     }
 
     /** @test */
@@ -224,7 +244,7 @@ class ImagesTest extends TestCase
 
         $object->images()->remove($image);
 
-        Storage::disk('public')->assertMissing($image->getPath('test'));
+        $this->disk->assertMissing($image->getPath('test'));
     }
 
     /** @test */
@@ -236,18 +256,15 @@ class ImagesTest extends TestCase
     /** @test */
     public function recreate_thumbnail_of_entity()
     {
-
     }
 
     /** @test */
     public function recreate_all_thumbnails_of_entity()
     {
-        
     }
 
     /** @test */
     public function recreate_thumbnails_of_all_entities()
     {
-
     }
 }

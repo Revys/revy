@@ -11,6 +11,9 @@ trait WithImages
 {
     protected $images;
 
+    /**
+     * @return Images
+     */
     public function images()
     {
         if ($this->images !== null)
@@ -48,6 +51,15 @@ trait WithImages
     public function getImageThumbnail($type)
     {
         return $this->getImageThumbnails()[$type] ?? false;
+    }
+
+    /**
+     * @param string $type
+     * @return bool
+     */
+    public function imageThumbnailExists($type)
+    {
+        return isset($this->getImageThumbnails()[$type]);
     }
 
     public function getImagesDir()

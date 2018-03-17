@@ -121,19 +121,15 @@ class Image extends Entity
      * @param null|\Closure $modifier
      * @return bool|\Intervention\Image\Image
      * @todo Create thumbnails on ImageAddEvent
+     * @throws \Exception
      */
     public function createThumbnail($name, $modifier = null)
     {
+        $this->assertThumbnailExists($name);
+
         $function = $this->object->getImageThumbnail($name);
 
-        if (! $function) {
-            \Log::error(
-                'Thumbnail with name "' . $name . '" does not exists at model ' . $this->object->getMorphClass()
-            );
-            return false;
-        }
-
-        $function = $modifier ?: $function;
+        $function = $modifier ?? $function;
 
         $disk = Storage::disk('public');
 
@@ -161,12 +157,7 @@ class Image extends Entity
 
     public function removeThumbnail($name)
     {
-        if ($this->object->getImageThumbnail($name) == false) {
-            \Log::warning(
-                'Thumbnail with name "' . $name . '" does not exists at model ' . $this->object->getMorphClass()
-            );
-            return true;
-        }
+        $this->assertThumbnailExists($name);
 
         Storage::disk('public')->delete($this->getPath($name));
 
@@ -180,4 +171,28 @@ class Image extends Entity
         }
     }
 
+    /**
+     * @param $name
+     * @return bool|\Intervention\Image\Image
+     * @throws \Exception
+     */
+    public function recreateThumbnail($name)
+    {
+        $this->assertThumbnailExists($name);
+
+        return $this->createThumbnail($name);
+    }
+
+    /**
+     * @param $name
+     * @throws \Exception
+     */
+    public function assertThumbnailExists($name) : void
+    {
+        if (! $this->getObject()->imageThumbnailExists($name)) {
+            throw new \Exception(
+                'Thumbnail with name "' . $name . '" does not exists at model ' . $this->object->getMorphClass()
+            );
+        }
+    }
 }

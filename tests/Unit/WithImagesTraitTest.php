@@ -20,7 +20,7 @@ class WithImagesTraitTest extends TestCase
     {
         $object = new TestEntity();
 
-        $object->id = 1;
+        $object->id = rand(1, 10000);
 
         return $object;
     }
@@ -64,5 +64,15 @@ class WithImagesTraitTest extends TestCase
 
         $this->assertInstanceOf(\Closure::class, $object->getImageThumbnail('original'));
         $this->assertFalse($object->getImageThumbnail('not_exist'));
+    }
+
+    /** @test */
+    public function imageThumbnailExists_works_correctly()
+    {
+        $object = self::getObject();
+
+        $this->assertTrue($object->imageThumbnailExists('test'));
+
+        $this->assertFalse($object->imageThumbnailExists('not-exists'));
     }
 }

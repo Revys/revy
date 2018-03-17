@@ -22,6 +22,9 @@ class TestEntity extends Entity
             },
             'test'     => function (Image $image, Entity $object) {
                 return $image->resize(100, 100);
+            },
+            'test2'    => function (Image $image, Entity $object) {
+                return $image->resize(15, 15);
             }
         ];
     }

@@ -136,4 +136,57 @@ class Images extends Collection
             return $item->filename == $image->filename;
         });
     }
+
+    /**
+     * @param string $name
+     */
+    public function removeThumbnail($name)
+    {
+        $this->assertThumbnailExists($name);
+
+        Storage::disk('public')->deleteDirectory($this->getObject()->getImageDir($name));
+    }
+
+    public function removeThumbnails()
+    {
+        $object = $this->getObject();
+
+        foreach ($object->getImageThumbnails() as $name => $modifier) {
+            Storage::disk('public')->deleteDirectory($object->getImageDir($name));
+        }
+    }
+
+    /**
+     * @param string $name
+     */
+    public function recreateThumbnail($name)
+    {
+        $this->assertThumbnailExists($name);
+
+        $this->each(function($image) use ($name) {
+            $image->recreateThumbnail($name);
+        });
+    }
+
+    public function recreateThumbnails()
+    {
+        foreach ($this->getObject()->getImageThumbnails() as $name => $modifier) {
+            $this->each(function ($image) use ($name) {
+                $image->recreateThumbnail($name);
+            });
+        }
+    }
+
+    /**
+     * @param $name
+     * @throws \Exception
+     */
+    public function assertThumbnailExists($name) : void
+    {
+        if (! $this->getObject()->imageThumbnailExists($name)) {
+            throw new \Exception(
+                'Thumbnail with name "' . $name . '" does not exists at model ' . $this->object->getMorphClass()
+            );
+        }
+    }
 }

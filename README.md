@@ -3,8 +3,8 @@
 Wrapper for Laravel Framework.
 
 ## Features
-- CRUD
-- Translations management
+- Multilanguage routes
+- Images management
 
 ## Installation
 
@@ -25,10 +25,13 @@ Wrapper for Laravel Framework.
     ```
     "revys/revy": "^0.0.1"
     ```
-
 4. Run migrations
     ```
-    php artisan migrate --seeder="Revys\Revy\Database\Seeds\DatabaseSeeder"
+    php artisan migrate
+    ```
+5. Run seeder
+    ```
+    php artisan db:seed --class="Revys\Revy\Database\Seeds\DatabaseSeeder"
     ```
     
 You are ready to go!
@@ -39,7 +42,7 @@ You are ready to go!
 ## Basic usage
 
 ### Routes 
-You can easily set multilang routes:
+You can easily set Multilanguage routes:
 ```php
 use Revys\Revy\App\Routes;
 
@@ -56,9 +59,3 @@ Routes::withLanguage(function () {
     Route::get('example/page', 'ExampleController@method');
 });
 ```
-
-
-## TODO
-- Tests
-- Sort images
-- Cache instance

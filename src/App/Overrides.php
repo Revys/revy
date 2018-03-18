@@ -26,13 +26,13 @@ class Overrides
         $this->overrides_directory = base_path() . DIRECTORY_SEPARATOR . $this->overrides_directory;
 
 		if (! is_dir($this->overrides_directory))
-			\File::makeDirectory($this->overrides_directory, 0777, true);
+			\File::makeDirectory($this->overrides_directory, 0755, true);
 
 		if (! is_dir($this->cache_classes))
-			\File::makeDirectory($this->cache_classes, 0777, true);
+			\File::makeDirectory($this->cache_classes, 0755, true);
 
 		if (! is_dir($this->cache_directory))
-			\File::makeDirectory($this->cache_directory, 0777, true);
+			\File::makeDirectory($this->cache_directory, 0755, true);
 
 		if (! \File::exists($this->map_file) or $this->forceIndex)
 			$this->indexOverrides();
@@ -84,12 +84,15 @@ class Overrides
 
 		$directories = array(
 			base_path('vendor/revys/revy/src/App'),
-//			base_path('vendor/revys/revy-admin/App')
+			base_path('vendor/revys/revy-admin/src/App')
 		);
 
 		\File::cleanDirectory($this->cache_classes);
 
 		foreach ($directories as $directory) {
+		    if (! \File::exists($directory))
+		        continue;
+
 			$files = \File::allFiles($directory);
 
 			if (count($files)) {
@@ -191,7 +194,7 @@ class Overrides
 				"}";
 
 				if (! \File::exists($dir))
-					\File::makeDirectory($dir, 0777, true);
+					\File::makeDirectory($dir, 0755, true);
 
 				if (file_put_contents($file, $content))
 					return str_replace(base_path(), '', $file);

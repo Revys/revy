@@ -10,9 +10,6 @@ use Revys\Revy\App\Overrides;
 use Illuminate\Support\ServiceProvider;
 
 
-/**
- * @todo Move providers initialization in composer.json
- */
 class RevyServiceProvider extends ServiceProvider
 {
     private static $packagePath = __DIR__.'/../../';

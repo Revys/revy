@@ -61,5 +61,4 @@ Routes::withLanguage(function () {
 ## TODO
 - Tests
 - Sort images
-- Resize images by specified types
 - Cache instance

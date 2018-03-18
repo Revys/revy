@@ -16,7 +16,7 @@ class LanguageSeeder extends Seeder
      */
     public function run()
     {
-        $this->languages = ['ru', 'ro'];
+        $this->languages = ['ru', 'en'];
 
         foreach ($this->languages as $language) {
             Language::create(

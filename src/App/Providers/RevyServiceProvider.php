@@ -69,6 +69,15 @@ class RevyServiceProvider extends ServiceProvider
 
     public function load()
     {
+        // Config
+        $this->mergeConfigFrom(self::$packagePath . 'config/config.php', self::$packageAlias);
+        $this->mergeConfigFrom(self::$packagePath . 'config/translatable.php', self::$packageAlias . '.translatable');
+
+        $this->publishes([
+            self::$packagePath.'/config/config.php' => config_path(self::$packageAlias.'/config.php'),
+            self::$packagePath.'/config/translatable.php' => config_path(self::$packageAlias.'/translatable.php'),
+        ], 'config');
+
         // Routes
         $this->loadRoutesFrom(self::$packagePath.'/routes.php');
 
@@ -85,11 +94,6 @@ class RevyServiceProvider extends ServiceProvider
         $this->loadTranslationsFrom(self::$packagePath . '/translations', self::$packageAlias);
         $this->loadJsonTranslationsFrom(self::$packagePath . '/translations', self::$packageAlias);
 
-        // Config
-        $this->publishes([
-            self::$packagePath.'/config/config.php' => config_path(self::$packageAlias.'/config.php'),
-            self::$packagePath.'/config/translatable.php' => config_path(self::$packageAlias.'/translatable.php'),
-        ], 'config');
 
         // Assets
         $this->publishes([
@@ -98,14 +102,6 @@ class RevyServiceProvider extends ServiceProvider
 
         // Migrations
         $this->loadMigrationsFrom(self::$packagePath.'/database/migrations');
-        $this->publishes([
-            self::$packagePath.'/database/migrations/' => database_path('migrations')
-        ], 'migrations');
-
-        // Factories
-        $this->publishes([
-            self::$packagePath.'/database/factories' => database_path('factories')
-        ], 'factories');
     }
 
     public function loadCommands()

@@ -1,6 +1,6 @@
 /node_modules
-/public/hot
-/public/storage
+/src/resources/public/hot
+/src/resources/public/storage
 /storage/*.key
 /vendor
 /.idea

@@ -20,7 +20,7 @@ class LanguageBase extends Entity
         if (strlen($code) <> 2)
             return false;
             
-        return self::where('code', $code)->published()->first();
+        return self::where('code', $code)->first();
     }
 
     public static function getLocales($force = false)

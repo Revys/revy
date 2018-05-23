@@ -109,7 +109,7 @@ class RevyServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 'Revys\Revy\App\Console\Commands\Overrides\MakeOverrideClass',
-                'Revys\Revy\App\Console\Commands\Overrides\IndexOverridesClass',
+                'Revys\Revy\App\Console\Commands\Overrides\IndexOverridesClass'
             ]);
         }
     }

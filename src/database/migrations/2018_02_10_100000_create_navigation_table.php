@@ -16,6 +16,7 @@ class CreateNavigationTable extends Migration
     {
         Schema::create('navigation', function (Blueprint $table) {
             $table->increments('id');
+            $table->string(Entity::getUrlIDField())->unique();
             $table->integer('parent_id')->unsigned()->nullable();
             $table->tinyInteger('status')->default(Entity::STATUS_PUBLISHED);
             $table->timestamps();

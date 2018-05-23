@@ -39,14 +39,14 @@ class EntityBase extends Model
      * @return string
      */
     public function getUrlID() {
-        return $this->{$this->getUrlIDField()};
+        return ($this->{$this->getUrlIDField()}) ?? null;
     }
 
     /**
      * @return string
      */
     public function getStringID() {
-        return $this->{$this->getStringIDField()};
+        return ($this->{$this->getStringIDField()}) ?? null;
     }
 
     /**

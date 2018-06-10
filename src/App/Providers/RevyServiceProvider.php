@@ -3,6 +3,7 @@
 namespace Revys\Revy\App\Providers;
 
 use Illuminate\Foundation\AliasLoader;
+use Illuminate\Support\Facades\DB;
 use Intervention\Image\Facades\Image;
 use Intervention\Image\ImageServiceProvider;
 use Revys\Revy\App\Revy;

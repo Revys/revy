@@ -6,12 +6,22 @@ trait Tree
 {
     public function parent()
     {
-        return $this->hasOne($this->getModel(), 'id', 'parent_id');
+        $result = $this->hasOne($this->getModel(), 'id', 'parent_id');
+
+        if (static::translatable())
+            $result->withTranslation();
+
+        return $result;
     }
     
     public function children()
     {
-        return $this->hasMany($this->getModel(), 'parent_id', 'id');
+        $result = $this->hasMany($this->getModel(), 'parent_id', 'id');
+
+        if (static::translatable())
+            $result->withTranslation();
+
+        return $result;
     }
     
     public static function tree($level = 4, $published = false)
@@ -32,6 +42,9 @@ trait Tree
 
         if ($published)
             $result->published();
+
+        if (static::translatable())
+            $result->withTranslation();
 
         return $result;
     }

@@ -103,11 +103,12 @@ class EntityBase extends Model
 //
 //        return $this;
     }
-    
+
     /**
      * Отбирает только опубликованные объекты
+     * @param Builder $query
      */
-    public function scopePublished($query)
+    public function scopePublished(Builder $query)
     {
         $query->where('status', '=', self::STATUS_PUBLISHED);
     }

@@ -2,6 +2,7 @@
 
 namespace Revys\Revy\App\Traits;
 
+use Illuminate\Database\Eloquent\Builder;
 use Intervention\Image\Exception\NotFoundException;
 use Revys\Revy\App\Entity;
 use Revys\Revy\App\Image;
@@ -101,5 +102,10 @@ trait WithImages
         $image->setObject($this);
 
         return $image;
+    }
+
+    public function image()
+    {
+        return optional($this->images()->first());
     }
 }

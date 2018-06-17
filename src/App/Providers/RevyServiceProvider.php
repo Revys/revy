@@ -71,7 +71,7 @@ class RevyServiceProvider extends ServiceProvider
     public function load()
     {
         // Config
-        $this->mergeConfigFrom(self::$packagePath . 'config/config.php', self::$packageAlias);
+        $this->mergeConfigFrom(self::$packagePath . 'config/config.php', self::$packageAlias . '.config');
         $this->mergeConfigFrom(self::$packagePath . 'config/translatable.php', self::$packageAlias . '.translatable');
 
         $this->publishes([

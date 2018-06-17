@@ -53,4 +53,9 @@ trait Tree
     {
         return static::tree($level, true);
     }
+
+    public function scopeFirstLevel($query)
+    {
+        return $query->whereNull('parent_id');
+    }
 }

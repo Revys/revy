@@ -2,9 +2,7 @@
 
 namespace Revys\Revy\App\Traits;
 
-use Illuminate\Database\Eloquent\Builder;
 use Intervention\Image\Exception\NotFoundException;
-use Revys\Revy\App\Entity;
 use Revys\Revy\App\Image;
 use Revys\Revy\App\Images;
 

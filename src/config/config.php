@@ -1,6 +1,6 @@
 <?php
 
 return [
-    'package_development' => true,
+    'package_development' => false,
 	'force_overrides_index' => false
 ];
